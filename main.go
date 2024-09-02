@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/go-chi/chi"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,25 +44,31 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 // 	}
 // }
 
-type Router struct{}
+// type Router struct{}
 
-func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch r.URL.Path {
-	case "/":
-		homeHandler(w, r)
-	case "/contact":
-		contactHandler(w, r)
-	case "/faq":
-		faqHandler(w, r)
-	default:
-		// TODO: handle the page not found error
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "<h1>Page Not Found</h1>")
-	}
-}
+// func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// 	switch r.URL.Path {
+// 	case "/":
+// 		homeHandler(w, r)
+// 	case "/contact":
+// 		contactHandler(w, r)
+// 	case "/faq":
+// 		faqHandler(w, r)
+// 	default:
+// 		// TODO: handle the page not found error
+// 		w.WriteHeader(http.StatusNotFound)
+// 		fmt.Fprint(w, "<h1>Page Not Found</h1>")
+// 	}
+// }
 
 func main() {
-	var router Router
+	r := chi.NewRouter()
+	r.Get("/", homeHandler)
+	r.Get("/contact", contactHandler)
+	r.Get("/faq", faqHandler)
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "Page not found", http.StatusNotFound)
+	})
 	fmt.Println("Starting the server on :3000 ...")
-	http.ListenAndServe(":3000", router)
+	http.ListenAndServe(":3000", r)
 }
