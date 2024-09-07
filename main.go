@@ -28,6 +28,19 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 	`)
 
 }
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	// fetch the url parameter `"userID"` from the request of a matching
+	// routing pattern. An example routing pattern could be: /users/{userID}
+	userID := chi.URLParam(r, "userID")
+
+	// fetch `"key"` from the request context
+	// ctx := r.Context()
+	// key := ctx.Value("key").(string)
+
+	// respond to the client
+	//w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Write([]byte(fmt.Sprintf("hi %v", userID)))
+}
 
 // func pathHandler(w http.ResponseWriter, r *http.Request) {
 // 	switch r.URL.Path {
@@ -66,6 +79,7 @@ func main() {
 	r.Get("/", homeHandler)
 	r.Get("/contact", contactHandler)
 	r.Get("/faq", faqHandler)
+	r.Get("/users", userHandler)
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
