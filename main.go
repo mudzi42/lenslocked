@@ -1,54 +1,72 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"path/filepath"
-	"text/template"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/mudzi42/lenslocked/controllers"
+	"github.com/mudzi42/lenslocked/templates"
+	"github.com/mudzi42/lenslocked/views"
 )
 
-func executeTemplate(w http.ResponseWriter, filepath string) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	tpl, err := template.ParseFiles(filepath)
-	if err != nil {
-		log.Printf("processing template: %v", err)
-		http.Error(w, "There was an error processing the template.", http.StatusInternalServerError)
-		return
-	}
-	err = tpl.Execute(w, nil)
-	if err != nil {
-		log.Printf("executing template: %v", err)
-		http.Error(w, "There was an error executing the template.", http.StatusInternalServerError)
-		return
-	}
-}
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	tplPath := filepath.Join("templates", "home.gohtml")
-	executeTemplate(w, tplPath)
-}
-
-func contactHandler(w http.ResponseWriter, r *http.Request) {
-	tplPath := filepath.Join("templates", "contact.gohtml")
-	executeTemplate(w, tplPath)
-}
-
-func faqHandler(w http.ResponseWriter, r *http.Request) {
-	tplPath := filepath.Join("templates", "faq.gohtml")
-	executeTemplate(w, tplPath)
-}
-
 func main() {
+	// exercise in errors
+	// err := B()
+	// if errors.Is(err, ErrNotFound) {
+	// 	fmt.Println("ErrNotFound")
+	// }
+
+	//
 	r := chi.NewRouter()
-	r.Get("/", homeHandler)
-	r.Get("/contact", contactHandler)
-	r.Get("/faq", faqHandler)
+
+	// tpl := views.Must(views.Parse(filepath.Join("templates", "home.gohtml")))
+	// r.Get("/", controllers.StaticHandler(tpl))
+
+	// // Or inline everything...
+	// r.Get("/contact", controllers.StaticHandler(
+	// 	views.Must(views.Parse(filepath.Join("templates", "contact.gohtml")))))
+	// r.Get("/faq", controllers.StaticHandler(
+	// 	views.Must(views.Parse(filepath.Join("templates", "faq.gohtml")))))
+	// r.Get("/page1", controllers.StaticHandler(
+	// 	views.Must(views.Parse(filepath.Join("templates", "page1.gohtml")))))
+	// r.Get("/page2", controllers.StaticHandler(
+	// 	views.Must(views.Parse(filepath.Join("templates", "page2.gohtml")))))
+
+	// r.Get("/", controllers.StaticHandler(
+	// 	views.Must(views.ParseFS(templates.FS, "home.gohtml"))))
+	// r.Get("/contact", controllers.StaticHandler(
+	// 	views.Must(views.ParseFS(templates.FS, "contact.gohtml"))))
+	// r.Get("/faq", controllers.FAQ(
+	// 	views.Must(views.ParseFS(templates.FS, "faq.gohtml"))))
+	// r.Get("/page1", controllers.StaticHandler(
+	// 	views.Must(views.ParseFS(templates.FS, "page1.gohtml"))))
+	// r.Get("/page2", controllers.StaticHandler(
+	// 	views.Must(views.ParseFS(templates.FS, "page2.gohtml"))))
+
+	r.Get("/", controllers.StaticHandler(views.Must(
+		views.ParseFS(templates.FS, "layout-page.gohtml", "home-page.gohtml"))))
+	r.Get("/contact", controllers.StaticHandler(views.Must(
+		views.ParseFS(templates.FS, "layout-page.gohtml", "contact-page.gohtml"))))
+
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Page not found", http.StatusNotFound)
 	})
 	fmt.Println("Starting the server on :3000...")
 	http.ListenAndServe(":3000", r)
+}
+
+var ErrNotFound = errors.New("not found")
+
+func A() error {
+	return ErrNotFound
+}
+
+func B() error {
+	err := A()
+	if err != nil {
+		return fmt.Errorf("b: %w", err)
+	}
+	return nil
 }
