@@ -1,9 +1,7 @@
-<h1>Welcome to my awesome site!</h1>
-{{template "lorem-ipsum" .}}
-{{template "lorem-ipsum"}}
-{{template "lorem-ipsum"}}
-{{define "lorem-ipsum"}}
-<p>
-Lorem ipsum dolor sit amet. Et cumque quia est laboriosam omnis et consequatur ducimus. Et beatae voluptatem ea necessitatibus dolorum ut sint dolores. Vel quibusdam saepe id voluptas dolores sit soluta ratione et dolorum amet in totam aliquid qui consectetur amet. Quo tempora quia aut vitae eius non eligendi ipsum aut sunt doloribus et nulla omnis et fugiat ducimus!
-</p>
-{{end}}
+{{template "header" .}}
+<div class="px-6">
+  <h1 class="py-4 text-4xl semibold tracking-tight">
+    Welcome to my awesome site!
+  </h1>
+</div>
+{{template "footer" .}}
